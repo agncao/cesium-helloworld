@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>Hello World!</title>
+    <script src="../libs/Cesium/Cesium.js"></script>
+    <style>
+      @import url(../libs/Cesium/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+      // const viewer = new Cesium.Viewer("cesiumContainer",{
+      //   imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+      //       url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+      //   })
+      // });
+
+
+    const viewer = new Cesium.Viewer("cesiumContainer");
+      const imageryLayer = Cesium.ImageryLayer.fromProviderAsync(Cesium.IonImageryProvider.fromAssetId(2411391));
+      viewer.imageryLayers.add(imageryLayer);
+
+    // const viewer = new Cesium.Viewer("cesiumContainer");
+    // const arcGisImagery = viewer.imageryLayers.addImageryProvider(
+    //     new Cesium.OpenStreetMapImageryProvider({
+    //         url: 'https://a.tile.openstreetmap.org/'
+    //     })
+    // );
+
+    // OSM：有没有什么标准被称之为OSM，比如上面的arc GIS为何不是OSM
+      //   const viewer = new Cesium.Viewer("cesiumContainer",{
+      //   imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+      //       url: 'https://a.tile.openstreetmap.org/'
+      //   })
+      // });
+    </script>
+  </body>
+</html>

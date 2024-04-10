@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>Hello World!</title>
+    <script src="../libs/Cesium/Cesium.js"></script>
+    <style>
+      @import url(../libs/Cesium/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+      // 影像叠加
+      // 在Cesium中可以将多个影像都加载到虚拟地球上，如下面代码中加载了Arcgis影像服务和切片Tile坐标两种影像：
+
+      Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+      const viewer = new Cesium.Viewer("cesiumContainer", {
+        // Use Cesium World Terrain
+        terrain: Cesium.Terrain.fromWorldTerrain(),
+      });
+    
+      let tileImagery = viewer.imageryLayers.addImageryProvider(new Cesium.TileCoordinatesImageryProvider());
+      const assetImagery = Cesium.ImageryLayer.fromProviderAsync(Cesium.IonImageryProvider.fromAssetId(2411391));
+      viewer.imageryLayers.add(assetImagery);
+
+
+      //过viewer.imageryLayers._layers[0]获取到第一个影像图层，即Arcgis影像图层，再修改其alpha、brightness和contrast属性对其影像的透明度、明亮度和对比度等属性进行修改：
+      // 修改影像的透明度、明亮度和对比度
+      viewer.imageryLayers._layers[0].alpha = 0.5
+      viewer.imageryLayers._layers[0].brightness = 2
+      viewer.imageryLayers._layers[0].contrast = 3
+
+      //ImageryLayerCollection中常用的方法
+      // 1. 判断ImageryLayerCollection中是否包含arc gis图层
+      let assetImageryContained = viewer.imageryLayers.contains(assetImagery);
+      // 2. 获取ImageryLayerCollection中的第二个影像图层
+      let getSecondImagery = viewer.imageryLayers.get(1);
+      // 3. 获取某个图层的索引
+      let index = viewer.imageryLayers.indexOf(getSecondImagery);
+    </script>
+  </body>
+</html>

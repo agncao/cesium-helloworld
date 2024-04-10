@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8" />
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <title>Hello World!</title>
+  <script src="../libs/Cesium/Cesium.js"></script>
+  <style>
+    @import url(../libs/Cesium/Widgets/widgets.css);
+
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+
+
+    <!-- you can import the CesiumJS JavaScript and CSS files from cesium CDN also
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.113/Build/Cesium/Widgets/widgets.css" rel="stylesheet"> -->
+  
+</head>
+
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    window.startup = async function (Cesium) {
+      var viewer = new Cesium.Viewer("cesiumContainer", {
+        terrain: Cesium.Terrain.fromWorldTerrain(),
+      });
+
+      let handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+      //监听鼠标左键按下事件
+      handler.setInputAction(function (mov) {
+        mousePosition = Cesium.Cartesian3.clone(mov.position);
+        console.log('mousePosition when mouse left down: ', mousePosition);
+        console.log('movement.position when mouse left down: ', mov);
+
+        let pick = viewer.scene.pick(mov.position);
+        if(Cesium.defined(pick)){
+          console.log('pick when mouse left down: ', pick);
+        }
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+      //监听鼠标移动
+      handler.setInputAction(function (mov) {
+        mousePosition = mov.endPosition;
+      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+      //监听鼠标左键抬起
+      handler.setInputAction(function (mov) {
+        moveActions.looking = false;
+        console.log('startMousePosition when mouse left up: ', startMousePosition);
+        console.log('mousePosition when mouse left up: ', mousePosition);
+        console.log('movement.position when mouse left up: ', mov);
+      }, Cesium.ScreenSpaceEventType.LEFT_UP);
+
+
+      // 每个时钟都会执行
+      viewer.clock.onTick.addEventListener(function (clock) {
+        var camera = viewer.camera;
+
+        if (moveActions.looking) {
+          var width = viewer.canvas.clientWidth;
+          var height = viewer.canvas.clientHeight;
+
+          // Coordinate (0.0, 0.0) will be where the mouse was clicked.  
+          var x = (mousePosition.x - startMousePosition.x) / width;
+          var y = -(mousePosition.y - startMousePosition.y) / height;
+          console.log('startMousePosition when camera changed: ', startMousePosition);
+          console.log('mousePosition when camera changed: ', mousePosition);
+
+          var lookFactor = 0.05;
+          camera.lookRight(x * lookFactor);
+          camera.lookUp(y * lookFactor);
+        }
+
+        // Change movement speed based on the distance of the camera to the surface of the ellipsoid.  
+        var cameraHeight = viewer.scene.globe.ellipsoid.cartesianToCartographic(camera.position).height;  //cartesianToCartographic方法返回Cartographic对象，其中包含了相机位置的经纬度和高度信息。
+        var moveRate = cameraHeight / 100.0;
+
+        if (moveActions.moveForward) {
+          camera.moveForward(moveRate);
+          console.log("move forward: " + moveRate);
+        }
+        if (moveActions.moveBackward) {
+          camera.moveBackward(moveRate);
+          console.log("move backward: " + moveRate);
+        }
+        if (moveActions.moveUp) {
+          camera.moveUp(moveRate);
+          console.log("move up: " + moveRate);
+        }
+        if (moveActions.moveDown) {
+          camera.moveDown(moveRate);
+          console.log("move down: " + moveRate);
+        }
+        if (moveActions.moveLeft) {
+          camera.moveLeft(moveRate);
+          console.log("move left: " + moveRate);
+        }
+        if (moveActions.moveRight) {
+          camera.moveRight(moveRate);
+          console.log("move right: " + moveRate);
+        }
+      });
+
+    };
+
+
+    if (typeof Cesium !== 'undefined') {
+      window.startupCalled = true;
+      window.startup(Cesium).catch((error) => {
+        "use strict";
+        console.error(error);
+      });
+    }
+
+    /**
+     * 为相机移动创建键盘事件处理器来切换标记。我们将为下面的按键和行为设置标记：
+     *   w 向前移动相机；
+     *   s 向后移动相机；
+     *   a 向左移动相机；
+     *   d 向右移动相机；
+     *   q 向上移动相机；
+     *   e 向下移动相机。
+     * */
+    function getFlagForKeyCode(keyCode) {
+      switch (keyCode) {
+        case 'W'.charCodeAt(0):
+          return 'moveForward';
+        case 'S'.charCodeAt(0):
+          return 'moveBackward';
+        case 'Q'.charCodeAt(0):
+          return 'moveUp';
+        case 'E'.charCodeAt(0):
+          return 'moveDown';
+        case 'D'.charCodeAt(0):
+          return 'moveRight';
+        case 'A'.charCodeAt(0):
+          return 'moveLeft';
+        default:
+          return undefined;
+      }
+    }
+
+
+    //监听键盘事件：keydown、keyup
+    document.addEventListener('keydown', function (e) {
+      var actionName = getFlagForKeyCode(e.keyCode);
+      console.log("key down: " + actionName);
+      if (typeof actionName !== 'undefined') {
+        moveActions[actionName] = true;
+      }
+    }, false);
+    document.addEventListener('keyup', function (e) {
+      var actionName = getFlagForKeyCode(e.keyCode);
+      console.log("key up: " + actionName);
+      if (typeof actionName !== 'undefined') {
+        moveActions[actionName] = false;
+      }
+    }, false);
+
+    // https://blog.csdn.net/newston/article/details/117803672
+
+  </script>
+</body>
+
+</html>

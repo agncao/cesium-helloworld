@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+    <title>Hello World!</title>
+    <script src="../libs/Cesium/Cesium.js"></script>
+    <style>
+        @import url(../libs/Cesium/Widgets/widgets.css);
+
+        html,
+        body,
+        #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cesiumContainer"></div>
+    <script>
+        Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+        window.startup = async function (Cesium) {
+            let viewer = new Cesium.Viewer("cesiumContainer", {
+                // terrainProvider: await Cesium.CesiumTerrainProvider.fromIonAssetId(3956),
+            });
+            let entity = viewer.entities.add({
+                position: Cesium.Cartesian3.fromDegrees(-75.59777, 40.03883),
+                billboard: {
+                    image: "../images/position_marker.png",
+                    show: true,
+                    pixelOffset: new Cesium.Cartesian2(0, 0), // 相对模型的原始位置的偏移量: x轴偏移量（像素单位）,y轴偏移量(像素单位)
+                    eyeOffset: new Cesium.Cartesian3(0.0, 0.0, 0.0),//相对于相机的偏移量，当多个billboard重叠时，可决定billboard放在最前面或最后面，最右边或者最左边等相对位置
+                    horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+                    verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                    // heightReference: window.Cesium.HeightReference.CLAMP_TO_GROUND, //如果不设置这项，billboard会显示在海平面位置上，而不是模型的地面位置上，看不到billboard
+                    scale: 0.2,
+                    // color: Cesium.Color.RED,
+                    // rotation: Cesium.Math.toRadians(45),
+                    sizeInMeters: true, //随着相机的拉远或者拉近，是否要缩小或者放大billboard
+                    scaleByDistance: new window.Cesium.NearFarScalar(50, 0.2, 5000, 0.1),//搭配着scale属性使用(最近距离，最近距离的倍数，最远距离，最远距离的倍数)
+                    alignedAxis: Cesium.Cartesian3.ZERO,
+                    width: 50,
+                    height: 50,
+                },
+                label: {
+                    text: "Philadelphia",
+                    font: "24px Helvetica",
+                    fillColor: Cesium.Color.SKYBLUE,
+                    outlineColor: Cesium.Color.BLACK,
+                    outlineWidth: 2,
+                    style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                    pixelOffset: new Cesium.Cartesian2(0, -50),
+                    // eyeOffset: new Cesium.Cartesian3(0.0, 0.0, 0.0),
+                    // horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
+                    // verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                    // heightReference: window.Cesium.HeightReference.CLAMP_TO_GROUND,
+                }
+            });
+
+            viewer.flyTo(entity);
+
+        };
+
+        if (typeof Cesium !== 'undefined') {
+            window.startup(Cesium).catch((error) => {
+                console.error(error);
+            });
+        }
+    </script>
+</body>
+
+</html>

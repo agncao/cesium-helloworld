@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8" />
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <title>Hello World!</title>
+  <script src="../libs/Cesium/Cesium.js"></script>
+  <style>
+    @import url(../libs/Cesium/Widgets/widgets.css);
+
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+    window.startup = async function (Cesium) {
+      const viewer = new Cesium.Viewer("cesiumContainer", {
+        shadows: true,
+      });
+
+      viewer.scene.globe.depthTestAgainstTerrain = true;
+
+      // Set the initial camera view to look at Manhattan
+      const initialPosition = Cesium.Cartesian3.fromDegrees(
+        -74.01881302800248,
+        40.69114333714821,
+        753
+      );
+      const initialOrientation = new Cesium.HeadingPitchRoll.fromDegrees(
+        21.27879878293835,
+        -21.34390550872461,
+        0.0716951918898415
+      );
+      viewer.scene.camera.setView({
+        destination: initialPosition,
+        orientation: initialOrientation,
+        endTransform: Cesium.Matrix4.IDENTITY,
+      });
+
+      let tileset = await Cesium.Cesium3DTileset.fromIonAssetId(75343);
+      viewer.scene.primitives.add(tileset);
+
+      let nameOverlay = document.createElement("div");
+      viewer.container.appendChild(nameOverlay);
+      nameOverlay.className = "backdrop";
+      nameOverlay.style.display = "none";
+      nameOverlay.style.position = "absolute";
+      nameOverlay.style.bottom = "0";
+      nameOverlay.style.left = "0";
+      nameOverlay.style["pointer-events"] = "none";
+      nameOverlay.style.padding = "4px";
+      nameOverlay.style.backgroundColor = "black";
+      nameOverlay.style.color = "white";
+
+      let lastSelected = { feature: undefined, originalColor: new window.Cesium.Color() };
+      function updateNameOverlay(pickedFeature, position) {
+        if (!Cesium.defined(pickedFeature)) {
+          nameOverlay.style.display = "none";
+          return;
+        }
+        console.log("pickedFeature: ", pickedFeature);
+
+        // A feature was picked, so show its overlay content
+        nameOverlay.style.display = "block";
+        nameOverlay.style.bottom = viewer.canvas.clientHeight - position.y + "px";
+        nameOverlay.style.left = position.x + "px";
+        nameOverlay.textContent = "(" + pickedFeature.getProperty("Longitude") + "," + pickedFeature.getProperty("Latitude") + "," + pickedFeature.getProperty("Height") + ")";
+      }
+
+      // 场景的后期处理如同PS照片，如果发现照片拍的不好，可以对照片进行调整，调整的过程就类似于这里的后期处理的过程
+      // Cesium.PostProcessStageLibrary 是为了给用户开放一个可以把三位模型渲染的更适合自己审美的功能，例如模型描边、黑白图、明亮调整、夜市效果等
+      if (Cesium.PostProcessStageLibrary.isSilhouetteSupported(viewer.scene)) {
+        // 有时候有些电脑的显卡不支持描边，所以这里要判断一下是否支持描边
+        let silhouetteBlue = Cesium.PostProcessStageLibrary.createEdgeDetectionStage();
+        silhouetteBlue.uniforms.color = window.Cesium.Color.BLUE;
+        silhouetteBlue.uniforms.length = 0.01;
+        silhouetteBlue.selected = [];
+
+        viewer.scene.postProcessStages.add(
+          Cesium.PostProcessStageLibrary.createSilhouetteStage([
+            silhouetteBlue,
+          ])
+        );
+
+        let handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+        handler.setInputAction(function (mov) {
+          // If a feature was previously highlighted, undo the highlight
+          silhouetteBlue.selected = [];
+
+          let pickedFeature = viewer.scene.pick(mov.endPosition);
+
+          //设置边框
+          if (!Cesium.defined(pickedFeature)) {
+            return;
+          }
+          if (lastSelected.feature !== pickedFeature) {
+            silhouetteBlue.selected = [pickedFeature];
+          }
+
+          //设置tileset的Feature弹出框
+          updateNameOverlay(pickedFeature, mov.endPosition);
+
+        }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+      } else {
+
+        let handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+        let lastSelected = { feature: undefined, originalColor: new window.Cesium.Color() };
+        handler.setInputAction(function (mov) {
+          let pickedFeature = viewer.scene.pick(mov.endPosition);
+
+          //设置tileset的Feature弹出框
+          updateNameOverlay(pickedFeature, mov.endPosition);
+
+
+          //设置选中的tileset填充色
+          if (Cesium.defined(lastSelected.feature) && lastSelected.feature !== pickedFeature) {
+            lastSelected.feature.color = lastSelected.originalColor;
+          }
+          if (lastSelected.feature !== pickedFeature) {
+            lastSelected.feature = pickedFeature;
+            Cesium.Color.clone(pickedFeature.color, lastSelected.originalColor);
+            pickedFeature.color = Cesium.Color.YELLOW;
+          }
+        }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+      }
+
+    };
+
+    if (typeof Cesium !== 'undefined') {
+      window.startup(Cesium).catch((error) => {
+        console.error(error);
+      });
+    }
+
+  </script>
+</body>
+
+</html>

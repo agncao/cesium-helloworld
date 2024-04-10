@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+    <title>移动的模型</title>
+    <script src="../libs/Cesium/Cesium.js"></script>
+    <style>
+        @import url(../libs/Cesium/Widgets/widgets.css);
+
+        html,
+        body,
+        #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cesiumContainer"></div>
+    <script type="text/javascript">
+        Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+        window.startup = async function (Cesium) {
+            //"cartographicDegrees"中的高度是指该点或模型在地球表面以上的垂直距离。
+            //例如，如果高度设置为150000米，那么这意味着该模型位于其在地球表面上的投影点之上150000米的位置。
+            var viewer = new Cesium.Viewer("cesiumContainer", {
+                terrain: Cesium.Terrain.fromWorldTerrain(),
+                shouldAnimate: true,
+                sceneMode: 2,
+            });
+            var czml = [{
+                "id": "document",
+                "name": "CZML Point - Time Dynamic",
+                "version": "1.0"
+            }, {
+                "id": "point",
+                "availability": "2012-08-04T16:00:00Z/2012-08-04T16:05:00Z",
+                "position": {
+                    "epoch": "2012-08-04T16:00:00Z",
+                    "cartographicDegrees": [
+                        0, 70, 20, 5000000,
+                        100, -80, 44, 5000000,
+                        200, -90, 18, 5000000,
+                        300, -98, 52, 5000000,
+                    ]
+                },
+                "model": {
+                    "gltf": "../apps/samples/models/CesiumAir/Cesium_Air.glb",
+                    "scale": 2.0,
+                    "minimumPixelSize": 128
+                },
+                path: {
+                    resolution: 1,
+                    material: new Cesium.PolylineGlowMaterialProperty({
+                        glowPower: 0.1,
+                        color: Cesium.Color.YELLOW
+                    }),
+                    width: 3
+                },
+            }];
+
+            viewer.dataSources.add(Cesium.CzmlDataSource.load(czml)).then(function (ds) {
+                var s = ds.entities.getById("point");
+                s.orientation = new Cesium.VelocityOrientationProperty(s.position);
+            });
+        }
+
+        if (Cesium.defined(Cesium)) {
+            window.startup(Cesium).catch((error) => {
+                console.error(error);
+            });
+        }
+    </script>
+</body>
+
+</html>

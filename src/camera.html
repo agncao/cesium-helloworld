@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>Hello World!</title>
+    <script src="../libs/Cesium/Cesium.js"></script>
+    <style>
+      @import url(../libs/Cesium/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+        const viewer = new Cesium.Viewer("cesiumContainer");
+        // //1, 飞到某个位置
+        // viewer.camera.flyTo({
+        //     destination: Cesium.Cartesian3.fromDegrees(-117.16, 32.71, 15000.0),
+        // });
+
+        // //2, 飞到某位置，并定义视角的朝向
+        // //orientation-相机镜头对准的方法
+        // //heading-代表镜头左右方向,正值为右,负值为左,360度和0度是一样的
+        // //pitch-代表镜头上下方向,正值为上,负值为下.
+        // //roll-代表镜头左右倾斜.正值,向右倾斜,负值向左倾斜
+        // viewer.camera.flyTo({
+        //     destination: Cesium.Cartesian3.fromDegrees(-117.16, 32.71, 15000.0),
+        //     orientation: {
+        //         heading: Cesium.Math.toRadians(20.0),   //Z轴
+        //         pitch: Cesium.Math.toRadians(-35.0),    //Y轴
+        //         roll: 0.0,  //x轴
+        //     },
+        // });
+
+
+        //3, 飞到一个以entity, entityCollection, DataSource, Cesium3DTilset作为视角中心
+        var west = -90.0;   //最西的经度，以弧度表示，在[-Pi，Pi]范围内。
+        var south = 38.0;   //以弧度表示的最南端的纬度，范围为[-Pi/2，Pi/2]。
+
+        var east = -87.0;   //最东经度，以弧度表示，在[-Pi，Pi]范围内。
+        var north = 40.0;   //最北端的纬度，以弧度表示，范围为[-Pi/2，Pi/2]。
+
+        var rectangle = viewer.entities.add({
+        rectangle: {
+            coordinates: Cesium.Rectangle.fromDegrees(west, south, east, north),
+        },
+        });
+
+        viewer.flyTo(rectangle);
+
+        console.log(viewer.scene.camera.heading);
+        console.log(viewer.scene.camera.pitch);
+        console.log(viewer.scene.camera.roll);
+        console.log(viewer.scene.camera.position)
+
+    </script>
+  </body>
+</html>
+

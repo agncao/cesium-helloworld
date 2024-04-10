@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8" />
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <title>Hello World!</title>
+  <script src="../libs/Cesium/Cesium.js"></script>
+  <style>
+    @import url(../libs/Cesium/Widgets/widgets.css);
+
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      // Use Cesium World Terrain
+      terrain: Cesium.Terrain.fromWorldTerrain(),
+    });
+
+    var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
+      Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0));
+    const gltfModel = Cesium.Model.fromGltfAsync({
+      url: '../apps/samples/models/GroundVehicle/GroundVehicle.glb',
+      //通过modelMatrix的选项fromGltf可以定位和旋转模型。
+      //样例中创建了一个地方坐标系统的模型，使用eastNorthUpToFixedFrame创建了一个地方由东到北的坐标系，坐标原点为经度-75.62898254394531度，纬度40.02804946899414度。
+      //这里使用的modelMatrix属性可以随意移动改变模型。
+      modelMatrix: modelMatrix,
+      scale: 200.0
+    });
+    let modelpromise = gltfModel.then(function (model) {
+      viewer.scene.primitives.add(model);
+      console.log(model);
+      model.readyEvent.addEventListener((arg1) => {
+        arg1.activeAnimations.add({
+          index: 0,
+          loop: Cesium.ModelAnimationLoop.REPEAT,
+          multiplier: 2,
+          reverse: true,
+        });
+      });
+    });
+
+    //任何位置增加以下代码，使用Cesium观察员可以看到坐标系：x轴（east东）是红色，y轴（north北）是绿色，z轴（up上）是蓝色。
+    viewer.extend(Cesium.viewerCesiumInspectorMixin);
+    //运行后,观察UI出现在左上角。展开Primitives，点击Pick a Primitive,然后点击选中地面车辆，再点击show reference frame。 
+
+
+    //点击F8，使用右上角的地理编码工具放大到Exton,PA。
+  </script>
+</body>
+
+</html>

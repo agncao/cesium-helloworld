@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+    <title>实时更新数据实现实体运功，按照新规划的路径行动</title>
+    <script src="../libs/Cesium/Cesium.js"></script>
+    <style>
+        @import url(../libs/Cesium/Widgets/widgets.css);
+
+        html,
+        body,
+        #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cesiumContainer"></div>
+    <script type="text/javascript">
+        Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+        window.startup = async function (Cesium) {
+            //"cartographicDegrees"中的高度是指该点或模型在地球表面以上的垂直距离。
+            //例如，如果高度设置为150000米，那么这意味着该模型位于其在地球表面上的投影点之上150000米的位置。
+            var viewer = new Cesium.Viewer("cesiumContainer", {
+                shouldAnimate: true,
+                shadows: true,
+                selectionIndicator: false,
+                infoBox: false,
+            });
+            var czml = [{
+                "id": "document",
+                "name": "CZML Path",
+                "version": "1.0",
+                "clock": {
+                    "interval": "2012-08-04T10:00:00Z/2012-08-04T15:00:00Z",
+                    "currentTime": "2012-08-04T10:00:00Z",
+                    "multiplier": 10
+                }
+            }, {
+                "id": "path",
+                "name": "path with GPS flight data",
+                "description": "<p>Hang gliding flight log data from Daniel H. Friedman.<br>Icon created by Larisa Skosyrska from the Noun Project</p>",
+                "availability": "2012-08-04T10:00:00Z/2012-08-04T15:00:00Z",
+                "path": {
+                    "material": {
+                        "polylineOutline": {
+                            "color": {
+                                "rgba": [255, 0, 255, 255]
+                            },
+                            "outlineColor": {
+                                "rgba": [0, 255, 255, 255]
+                            },
+                            "outlineWidth": 5
+                        }
+                    },
+                    "width": 8,
+                    "leadTime": 0, // 路线提前执行时间
+                    "trailTime": 100000, // 路线跟踪时间
+                    "resolution": 5,
+                    //"arcType" : "RHUMB",
+                },
+                "ellipse": { // 椭圆
+                    "semiMinorAxis": 10.0, // 椭圆大小
+                    "semiMajorAxis": 20.0,
+                    "height": 0,
+                    "material": {
+                        "solidColor": {
+                            "color": {
+                                "rgba": [255, 0, 0, 127]
+                            }
+                        }
+                    },
+                    "outline": true, // height must be set for outlines to display
+                    "outlineColor": { // 边框颜色
+                        "rgba": [255, 255, 255, 255]
+                    }
+                },
+                "position": {
+                    "epoch": "2012-08-04T10:00:00Z",
+                    "cartographicDegrees": [
+                        0.0, 118.87841653400005, 30.956798, 0.0,
+                        10.0, 118.87826541800007, 30.956799, 0.0,
+
+                    ]
+                }
+            }];
+
+            viewer.dataSources
+                .add(Cesium.CzmlDataSource.load(czml))
+                .then(function (ds) {
+                    viewer.trackedEntity = ds.entities.getById("path");
+                });
+
+            // 动态赋值
+            var yDegree = 30.956800;
+            var timeRange = 20;
+            var xDegree = 118.8774481050001;
+            setInterval(function () {
+                yDegree += 0.001 * Math.random();
+                xDegree += 0.001 * Math.random();
+                timeRange += 10;
+                //路径最后添加节点
+                czml[1].position.cartographicDegrees.push(timeRange, xDegree, yDegree, 0);// 赋值当前最新行驶路线
+                czml[0].clock.currentTime = viewer.clock.currentTime.toString(); // 修改当前时间，防止从头重新开始执行
+                //清空之前数据，否则数据越来越多
+                viewer.entities.removeAll();
+                //重新添加修改后的数据
+                viewer.dataSources.add(Cesium.CzmlDataSource.load(czml));
+            }, 1000);
+        }
+
+        if (Cesium.defined(Cesium)) {
+            window.startup(Cesium).catch((error) => {
+                console.error(error);
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+    <title>Hello World!</title>
+    <script src="../libs/Cesium/Cesium.js"></script>
+    <style>
+        @import url(../libs/Cesium/Widgets/widgets.css);
+
+        html,
+        body,
+        #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cesiumContainer" class="fullSize"></div>
+    <div id="toolbar">
+        <table class="infoPanel">
+            <tbody>
+                <tr>
+                    <td>
+                        Click on the 3D window then use the keyboard to change settings.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Heading: <span id="heading"></span>°</td>
+                </tr>
+                <tr>
+                    <td>← to left/→ to right</td>
+                </tr>
+                <tr>
+                    <td>Pitch: <span id="pitch"></span>°</td>
+                </tr>
+                <tr>
+                    <td>↑ to up/↓ to down</td>
+                </tr>
+                <tr>
+                    <td>roll: <span id="roll"></span>°</td>
+                </tr>
+                <tr>
+                    <td>← + ⇧ left/→ + ⇧ right</td>
+                </tr>
+                <tr>
+                    <td>Speed: <span id="speed"></span>m/s</td>
+                </tr>
+                <tr>
+                    <td>↑ + ⇧ to speed up/↓ + ⇧ to speed down</td>
+                </tr>
+                <tr>
+                    <td>
+                        following aircraft
+                        <input id="fromBehind" type="checkbox">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+
+        Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+        window.startup = async function (Cesium) {
+            let viewer = new Cesium.Viewer("cesiumContainer", {
+                // infoBox: false,
+                // selectionIndicator: false,
+                shouldAnimate: true, //启动动画效果，非常重要
+            });
+
+            const pathPosition = new Cesium.SampledPositionProperty();
+            const entityPath = viewer.entities.add({
+                position: pathPosition,
+                name: "path",
+                path: {
+                    show: true,
+                    leadTime: 0,
+                    trailTime: 60,
+                    width: 10,
+                    resolution: 1,
+                    material: new Cesium.PolylineGlowMaterialProperty({
+                        glowPower: 0.3,
+                        taperPower: 0.3,
+                        color: Cesium.Color.PALEGOLDENROD,
+                    }),
+                },
+            });
+
+            let position = Cesium.Cartesian3
+                .fromDegrees(-123.0744619, 44.0503706, 5000.0);
+            let fixedFrameTransform = Cesium.Transforms
+                .localFrameToFixedFrameGenerator("north", "west");
+            let hpRoll = new Cesium.HeadingPitchRoll();
+            let hpRange = new Cesium.HeadingPitchRange();
+
+            //modelMatrix 是一个在 3D 图形和游戏开发中常用的术语，它是一个变换矩阵，用于定义一个物体在 3D 空间中的位置、旋转和缩放。
+            let planePrimitive = await Cesium.Model.fromGltfAsync({
+                url: "../apps/samples/models/CesiumAir/Cesium_Air.glb",
+                modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame( //这个函数创建一个表示地理位置的 Cartesian3 对象
+                    position,
+                    hpRoll,  //这是一个表示方向的对象
+                    Cesium.Ellipsoid.WGS84, //这是一个表示地球形状的椭球体对象，WGS84 是全球定位系统使用的地球参考椭球体。
+                    fixedFrameTransform
+                ),
+                minimumPixelSize: 128,
+            });
+            viewer.scene.primitives.add(planePrimitive);
+
+            //readyEvent是Model对象的一个事件，当该图形元素完全加载并准备好被渲染时，这个事件会被触发
+            //addEventListener 是一个方法，用于向 readyEvent 事件添加一个监听器（或称为回调函数）。
+            //当事件被触发时，这个监听器会被执行。这允许开发者在图形元素准备好之后立即执行一些操作，
+            //比如更新图形的位置、调整视角、添加动画或者其他自定义的逻辑。
+            planePrimitive.readyEvent.addEventListener(() => {
+                // 这里的代码会在 planePrimitive 完全加载并准备好渲染时执行
+                // 例如，可以在这里更新模型的位置或者应用一些动画效果
+                planePrimitive.activeAnimations.addAll({
+                    //这个属性用于控制动画播放的速度。
+                    //值 1.0 表示动画以其原始速度播放，0.5 表示动画以半速播放，2.0 表示动画以双倍速度播放，等等
+                    multiplier: 0.5,
+                    loop: Cesium.ModelAnimationLoop.REPEAT,
+                });
+
+                let r = 2.0 * Math.max(planePrimitive.boundingSphere.radius,
+                    viewer.camera.frustum.near);
+                viewer.scene.screenSpaceCameraController.minimumZoomDistance = r * 0.5;
+                hpRange.heading = Cesium.Math.toRadians(230.0);
+                hpRange.pitch = Cesium.Math.toRadians(-20.0);
+                hpRange.range = r * 50.0;
+                viewer.camera.lookAt(planePrimitive.boundingSphere.center, hpRange);
+            }, planePrimitive);
+
+            let speedVector = new Cesium.Cartesian3();
+            let speed = 10;
+
+            //preUpdate 事件在每个场景更新（即每一帧）之前触发，允许你在场景渲染之前执行代码
+            viewer.scene.preUpdate.addEventListener((scene, time) => {
+                //计算速度向量
+                speedVector = Cesium.Cartesian3.multiplyByScalar(
+                    Cesium.Cartesian3.UNIT_X,   //一个不变的Cartesian3实例，初始化为（1.0，0.0，0.0）  
+                    speed / 10, //要与之相乘的标量。
+                    speedVector
+                );
+                //3. 更新位置:
+                position = Cesium.Matrix4.multiplyByPoint(
+                    planePrimitive.modelMatrix,
+                    speedVector,
+                    position
+                );
+                //4. 记录路径位置:将当前的位置 position 添加到某种路径记录中，使用当前的时间作为采样点。
+                pathPosition.addSample(Cesium.JulianDate.now(), position);
+                //5. 更新模型矩阵以反映新的位置和方向:
+                Cesium.Transforms.headingPitchRollToFixedFrame(
+                    position,   //位置
+                    hpRoll, //航向、俯仰、滚转
+                    Cesium.Ellipsoid.WGS84, //这是一个表示地球形状的椭球体对象，WGS84 是全球定位系统使用的地球参考椭球体。
+                    fixedFrameTransform, //局部坐标系转换为固定坐标系
+                    planePrimitive.modelMatrix //要更新的模型矩阵
+                );
+
+                //6. 更新相机位置:
+                // hpRange.heading = hpRoll.heading;
+                // hpRange.pitch = hpRoll.pitch;
+                viewer.camera.lookAt(position, hpRange);
+            });
+
+
+
+        };
+
+        if (typeof Cesium !== 'undefined') {
+            window.startup(Cesium).catch((error) => {
+                console.error(error);
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>Hello World!</title>
+    <script src="../libs/Cesium/Cesium.js"></script>
+    <style>
+      @import url(../libs/Cesium/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+        // window.startup = async function (Cesium) {
+        //     'use strict';
+        //     // Grant CesiumJS access to your ion assets
+        //     Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+
+        //     try {
+        //         const viewer = new Cesium.Viewer("cesiumContainer", {
+        //             terrainProvider: await Cesium.CesiumTerrainProvider.fromIonAssetId(3956),
+        //         });
+        //     } catch (error) {
+        //         console.log(error);
+        //     }
+        // };
+
+        // if (typeof Cesium !== 'undefined') {
+        //     window.startupCalled = true;
+        //     window.startup(Cesium).catch((error) => {
+        //     "use strict";
+        //     console.error(error);
+        //     });
+        // }
+
+        Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+
+        try {
+                const terrain = Cesium.CesiumTerrainProvider.fromIonAssetId(3956);
+                terrain.then(function(t){
+                    const viewer = new Cesium.Viewer("cesiumContainer", {
+                    terrainProvider: t,
+                });
+                });
+            } catch (error) {
+                console.log(error);
+            }
+
+        // // EllipsoidTerrainProvider：高程为 0 的地形服务，如果初始化时不指定地形，那么默认的就是使用的该地形服务；
+        // const viewer = new Cesium.Viewer("cesiumContainer");
+        // viewer.terrainProvider = new Cesium.EllipsoidTerrainProvider()
+
+
+        // //CesiumTerrainProvider用于加载自行发布的地形服务或其他地形服务商发布的地形服务,
+        // //例如家在火星科技地形（没有加载出来啊，实际应用会用到这个吗）
+        // const terrain = new Cesium.CesiumTerrainProvider({
+        //     url: "http://data.mars3d.cn/terrain",
+        // });
+        // viewer.terrainProvider = terrain;
+
+        // //由ArcGIS提供的地形服务；
+        // const arcGISTerrain = new Cesium.ArcGISTiledElevationTerrainProvider.fromUrl("https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer", 
+        // {
+        //     token: "KED1aF_I4UzXOHy3BnhwyBHU4l5oY6rO6walkmHoYqGp4XyIWUd5YZUC1ZrLAzvV40pR6gBXQayh0eFA8m6vPg.."
+        // });
+        // viewer.terrainProvider = arcGISTerrain;
+    </script>
+  </body>
+</html>

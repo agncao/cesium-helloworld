@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>Hello World!</title>
+    <script src="../libs/Cesium/Cesium.js"></script>
+    <style>
+      @import url(../libs/Cesium/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+      // const viewer = new Cesium.Viewer("cesiumContainer",{
+      //   timeline:false, //隐藏时间轴
+      //   animation: false, //隐藏动画速度控制器
+      //   navigationHelpButton: false,  //隐藏帮助按钮
+      //   baseLayerPicker: false, //隐藏图层选择器
+      //   geocoder: false,  //隐藏地理位置查找
+      //   homeButton:false, //初始位置：地球
+      //   seceneModePicker: false,  //隐藏视角选择器
+
+      // });
+      const viewer = new Cesium.Viewer("cesiumContainer", {
+        // Use Cesium World Terrain
+        terrain: Cesium.Terrain.fromWorldTerrain(),
+      });
+
+
+    //   try {
+    //   const viewer = new Cesium.Viewer("cesiumContainer", {
+    //     // Start in 哥伦布实图
+    //     sceneMode: Cesium.SceneMode.COLUMBUS_VIEW,
+    //     // Use Cesium World Terrain
+    //     terrain: Cesium.Terrain.fromWorldTerrain(),
+    //     // Hide the base layer picker
+    //     baseLayerPicker: false,
+    //     // Use OpenStreetMaps
+    //     baseLayer: new Cesium.ImageryLayer(new Cesium.OpenStreetMapImageryProvider({
+    //       url: "https://tile.openstreetmap.org/"
+    //     })),
+    //     //cesium实现自定义的天空盒效果
+    //     skyBox: new Cesium.SkyBox({
+    //       sources: {
+    //         positiveX: "stars/TychoSkymapII.t3_08192x04096_80_px.jpg",
+    //         negativeX: "stars/TychoSkymapII.t3_08192x04096_80_mx.jpg",
+    //         positiveY: "stars/TychoSkymapII.t3_08192x04096_80_py.jpg",
+    //         negativeY: "stars/TychoSkymapII.t3_08192x04096_80_my.jpg",
+    //         positiveZ: "stars/TychoSkymapII.t3_08192x04096_80_pz.jpg",
+    //         negativeZ: "stars/TychoSkymapII.t3_08192x04096_80_mz.jpg"
+    //       }
+    //     }),
+    //     // Show Columbus View map with Web Mercator projection
+    //     mapProjection: new Cesium.WebMercatorProjection()
+    //   });
+    // } catch (error) {
+    //   console.log(error);
+    // }
+    
+    </script>
+  </body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8" />
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <title>Hello World!</title>
+  <script src="../libs/Cesium/Cesium.js"></script>
+  <style>
+    @import url(../libs/Cesium/Widgets/widgets.css);
+
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    //Cesium 中的三维坐标可分为三种情况：椭球表面、地形和模型。
+
+    Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+    window.startup = async function (Cesium) {
+      //Sandcastle_Begin
+      var viewer = new Cesium.Viewer("cesiumContainer", {
+        terrain: Cesium.Terrain.fromWorldTerrain(),
+      });
+
+      viewer.scene.globe.depthTestAgainstTerrain = true;
+
+      //Cesium.Cartesian3.fromDegrees：longitude, latitude, height , ellipsoid , result
+      var box = viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(-114.0, 40.0, 300000.0),
+        box: {
+          dimensions: new Cesium.Cartesian3(400.0, 300.0, 500.0),
+          material: Cesium.Color.BLUE.withAlpha(0.5)
+        }
+      });
+      viewer.zoomTo(viewer.entities);
+
+      var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+      handler.setInputAction(function (movement) {
+        // viewer.scene.pick(): 通过坐标位置，拾取实体（Entity），图元（Primitive）,3DTiles对象，返回的是scene中指定位置最上层的对象。
+        // 例如点击获取Entity的pick对象，通过pick.id可以拾取当前的entity对象。拾取后，可以用于改变对象的属性参数，如颜色，图片等。
+        var pickedFeature = viewer.scene.pick(movement.position);
+        if (Cesium.defined(pickedFeature)) {
+          console.log(pickedFeature);
+          let entity = Cesium.defaultValue(pickedFeature.id, pickedFeature.primitive.id);
+          if (entity instanceof Cesium.Entity) {
+            console.log(entity);
+          }
+        }
+
+        //viewer.scene.globe.pick(): 返回一个射线（ray）和地球表面的一个交点的Cartesian3坐标。此方法一般用于获取加载地形后的经纬度和高程，不包括模型、倾斜摄影等表面高度。
+        //*注意事项：**最好开启深度检测（viewer.scene.globe.depthTestAgainstTerrain = true）
+        let ray = viewer.camera.getPickRay(movement.position);//获取一条射线
+        let position = viewer.scene.globe.pick(ray, viewer.scene);
+        console.log("当前拾取的经纬度坐标：", position);
+
+        //viewer.scene.camera.pickEllipsoid():
+        //返回相机视角下鼠标点击的对应椭球面位置。接收屏幕坐标，返回Cartesian3坐标。适用裸球表面的选取，是基于数学模型的椭圆球体。
+        let cartesian = viewer.scene.camera.pickEllipsoid(movement.position, viewer.scene.globe.ellipsoid);
+        console.log("当前拾取的椭球面坐标：", cartesian);
+        // 将弧度转换为度的十进制表示
+        lng = Cesium.Math.toDegrees(cartographic.longitude);
+        lat = Cesium.Math.toDegrees(cartographic.latitude);
+        // 获取相机的高度
+        height = Math.ceil(viewer.camera.positionCartographic.height);
+        console.log("相机高度：", height);
+
+        //viewer.scene.pickPosition():拾取对应位置的Cartesian3，适用于模型表面位置的选取，拾取三维物体的坐标等。
+        //注意事项： 一定开启深度检测（viewer.scene.globe.depthTestAgainstTerrain = true），否则在没有没有3dTile模型的情况下，会出现空间坐标不准的问题。
+        let cartesian2 = viewer.scene.pickPosition(movement.position);
+        console.log("当前拾取的三维坐标：", cartesian2);
+
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    };
+    if (typeof Cesium !== 'undefined') {
+      //window.startupCalled 是什么意思？
+      window.startupCalled = true;
+      window.startup(Cesium).catch((error) => {
+        console.error(error);
+      });
+    }
+
+  </script>
+</body>
+
+</html>
