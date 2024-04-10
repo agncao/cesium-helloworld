@@ -10,9 +10,9 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
   <title>Hello World!</title>
-  <script src="../libs/Cesium/Cesium.js"></script>
+  <script src="../../libs/Cesium/Cesium.js"></script>
   <style>
-    @import url(../libs/Cesium/Widgets/widgets.css);
+    @import url(../../libs/Cesium/Widgets/widgets.css);
 
     html,
     body,
@@ -29,6 +29,7 @@
 <body>
   <div id="cesiumContainer"></div>
   <script>
+    Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
     const viewer = new Cesium.Viewer("cesiumContainer", {
       // Use Cesium World Terrain
       terrain: Cesium.Terrain.fromWorldTerrain(),
@@ -37,7 +38,7 @@
     var modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
       Cesium.Cartesian3.fromDegrees(-75.62898254394531, 40.02804946899414, 0.0));
     const gltfModel = Cesium.Model.fromGltfAsync({
-      url: '../apps/samples/models/GroundVehicle/GroundVehicle.glb',
+      url: '../../apps/samples/models/GroundVehicle/GroundVehicle.glb',
       //通过modelMatrix的选项fromGltf可以定位和旋转模型。
       //样例中创建了一个地方坐标系统的模型，使用eastNorthUpToFixedFrame创建了一个地方由东到北的坐标系，坐标原点为经度-75.62898254394531度，纬度40.02804946899414度。
       //这里使用的modelMatrix属性可以随意移动改变模型。

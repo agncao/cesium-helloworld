@@ -10,9 +10,9 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
   <title>Hello World!</title>
-  <script src="../libs/Cesium/Cesium.js"></script>
+  <script src="../../libs/Cesium/Cesium.js"></script>
   <style>
-    @import url(../libs/Cesium/Widgets/widgets.css);
+    @import url(../../libs/Cesium/Widgets/widgets.css);
 
     html,
     body,
@@ -29,9 +29,9 @@
 <body>
   <div id="cesiumContainer"></div>
   <script>
+    Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+
     window.startup = async function (Cesium) {
-      "use strict";
-      //Sandcastle_Begin
       var viewer = new Cesium.Viewer("cesiumContainer", {
         terrain: Cesium.Terrain.fromWorldTerrain(),
       });
@@ -40,43 +40,32 @@
       var osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
       viewer.scene.primitives.add(osmBuildingsTileset);
 
-      viewer.camera
-        // 从洛杉矶飞往东京
-        .flyTo({
-          // xyz, 注意与经纬度的用法区别
-          destination: new Cesium.Cartesian3.fromDegrees(139.8148, 35.7142, 20000.0),
-          orientation: {
-            heading: Cesium.Math.toRadians(15.0),
-            pitch: Cesium.Math.toRadians(-60),
-            roll: 0.0,
-          },
-          duration: 20,
-          flyOverLongitude: Cesium.Math.toRadians(60.0),
-          complete: function () {
-            setTimeout(function () {
-              viewer.camera.flyTo({
-                destination: new Cesium.Cartesian3.fromDegrees(-117.729, 34.457, 10000.0),
-                orientation: {
-                  heading: Cesium.Math.toRadians(-15.0),
-                  pitch: -Cesium.Math.PI_OVER_FOUR,
-                  roll: 0.0,
-                },
-                easingFunction: Cesium.EasingFunction.LINEAR_NONE,
-                duration: 5 //飞行持续时间（以秒为单位）。如果省略，Cesium会尝试根据航班飞行的距离来计算理想持续时间。
-              });
-            }, 1000);
-          },
-        });
+      // flyTo using QUADRATIC_IN_OUT easing function
+      viewer.camera.flyTo({
+        // xyz, 注意与经纬度的用法区别
+        destination: new Cesium.Cartesian3(-3961951.575572026, 3346492.0945766014, 3702340.5336036095),
+        orientation: {
+          direction: new Cesium.Cartesian3(0.8982074415844437, -0.4393530288745287, 0.013867512433959908),
+          up: new Cesium.Cartesian3(0.12793638617798253, 0.29147314437764565, 0.9479850669701113), //相机的向上方向。
+        },
+        complete: function () {
+          setTimeout(function () {
+            viewer.camera.flyTo({
+              destination: new Cesium.Cartesian3(-2304817.2435183465, -3639113.128132953, 4688495.013644141),
+              orientation: {
+                direction: new Cesium.Cartesian3(0.3760550186878076, 0.9007147395506565, 0.21747547189489164),
+                up: new Cesium.Cartesian3(-0.20364591529594356, -0.14862471084230877, 0.9676978022659334),
+              },
+              easingFunction: Cesium.EasingFunction.LINEAR_NONE,
+              duration: 5 //飞行持续时间（以秒为单位）。如果省略，Cesium会尝试根据航班飞行的距离来计算理想持续时间。
+            });
+          }, 1000);
+        },
+      });
 
-      //Sandcastle_End
-      Sandcastle.finishedLoading();
     };
-
-
     if (typeof Cesium !== 'undefined') {
-      window.startupCalled = true;
       window.startup(Cesium).catch((error) => {
-        "use strict";
         console.error(error);
       });
     }
@@ -114,7 +103,6 @@
     Cesium.EasingFunction.SINUSOIDAL_IN_OUT//正弦曲线进与出
     Cesium.EasingFunction.SINUSOIDAL_OUT//正弦曲线出
     */
-   
 
   </script>
 </body>

@@ -10,9 +10,9 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
   <title>Hello World!</title>
-  <script src="../libs/Cesium/Cesium.js"></script>
+  <script src="../../libs/Cesium/Cesium.js"></script>
   <style>
-    @import url(../libs/Cesium/Widgets/widgets.css);
+    @import url(../../libs/Cesium/Widgets/widgets.css);
 
     html,
     body,
@@ -36,7 +36,7 @@
       });
 
       viewer.scene.globe.depthTestAgainstTerrain = true;
-      let tileset = await Cesium.Cesium3DTileset.fromUrl("../apps/samples/Cesium3DTiles/Hierarchy/BatchTableHierarchy/tileset.json");
+      let tileset = await Cesium.Cesium3DTileset.fromUrl("../../apps/samples/Cesium3DTiles/Hierarchy/BatchTableHierarchy/tileset.json");
       viewer.scene.primitives.add(tileset);
       //Cesium.HeadingPitchRange 是 CesiumJS 库中的一个类，用于定义一个视角，包括朝向（heading）、俯仰角（pitch）和距离（range）。这个类通常用于在3D场景中定位相机，以便从特定的角度和距离观察一个对象。
       //朝向（Heading）：是一个角度值，表示观察方向沿着地面平面的旋转角度，通常以弧度为单位。朝向为0时，表示朝向正北方向，正值表示顺时针旋转，负值表示逆时针旋转。

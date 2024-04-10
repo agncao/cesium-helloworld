@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8" />
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <title>Hello World!</title>
+  <script src="../../libs/Cesium/Cesium.js"></script>
+  <style>
+    @import url(../../libs/Cesium/Widgets/widgets.css);
+
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+    window.startup = async function (Cesium) {
+      "use strict";
+      //Sandcastle_Begin
+      var viewer = new Cesium.Viewer("cesiumContainer", {
+        terrain: Cesium.Terrain.fromWorldTerrain(),
+      });
+
+      // Add OSM Building tileset 
+      var osmBuildingsTileset = await Cesium.createOsmBuildingsAsync();
+      viewer.scene.primitives.add(osmBuildingsTileset);
+
+      viewer.camera
+        // 从洛杉矶飞往东京
+        .flyTo({
+          // xyz, 注意与经纬度的用法区别
+          destination: new Cesium.Cartesian3.fromDegrees(139.8148, 35.7142, 20000.0),
+          orientation: {
+            heading: Cesium.Math.toRadians(15.0),
+            pitch: Cesium.Math.toRadians(-60),
+            roll: 0.0,
+          },
+          duration: 20,
+          flyOverLongitude: Cesium.Math.toRadians(60.0),
+          complete: function () {
+            setTimeout(function () {
+              viewer.camera.flyTo({
+                destination: new Cesium.Cartesian3.fromDegrees(-117.729, 34.457, 10000.0),
+                orientation: {
+                  heading: Cesium.Math.toRadians(-15.0),
+                  pitch: -Cesium.Math.PI_OVER_FOUR,
+                  roll: 0.0,
+                },
+                easingFunction: Cesium.EasingFunction.LINEAR_NONE,
+                duration: 5 //飞行持续时间（以秒为单位）。如果省略，Cesium会尝试根据航班飞行的距离来计算理想持续时间。
+              });
+            }, 1000);
+          },
+        });
+
+      //Sandcastle_End
+      Sandcastle.finishedLoading();
+    };
+
+
+    if (typeof Cesium !== 'undefined') {
+      window.startupCalled = true;
+      window.startup(Cesium).catch((error) => {
+        "use strict";
+        console.error(error);
+      });
+    }
+
+    /*
+    Cesium.EasingFunction.BACK_IN //回到
+    Cesium.EasingFunction.BACK_IN_OUT //进入在出来
+    Cesium.EasingFunction.BACK_OUT //退出
+    Cesium.EasingFunction.BOUNCE_IN //弹出去
+    Cesium.EasingFunction.BOUNCE_IN_OUT //弹进去然后退出。
+    Cesium.EasingFunction.BOUNCE_OUT  //弹出来。
+    Cesium.EasingFunction.CIRCULAR_IN  //循环进
+    Cesium.EasingFunction.CIRCULAR_IN_OUT //循环进与出
+    Cesium.EasingFunction.CIRCULAR_OUT  //循环出
+    Cesium.EasingFunction.CUBIC_IN //曲线进
+    Cesium.EasingFunction.CUBIC_IN_OUT //曲线进与出
+    Cesium.EasingFunction.CUBIC_OUT //曲线出
+    Cesium.EasingFunction.ELASTIC_IN //弹性的进
+    Cesium.EasingFunction.ELASTIC_IN_OUT //弹性的进与出
+    Cesium.EasingFunction.ELASTIC_OUT//弹性的出
+    Cesium.EasingFunction.EXPONENTIAL_IN //曲线进
+    Cesium.EasingFunction.EXPONENTIAL_IN_OUT//曲线进与出
+    Cesium.EasingFunction.EXPONENTIAL_OUT //曲线出
+    Cesium.EasingFunction.LINEAR_NONE //线性缓动
+    Cesium.EasingFunction.QUADRATIC_IN//二次进
+    Cesium.EasingFunction.QUADRATIC_IN_OUT//二次进与出
+    Cesium.EasingFunction.QUADRATIC_OUT//二次出
+    Cesium.EasingFunction.QUARTIC_IN//四次进
+    Cesium.EasingFunction.QUARTIC_IN_OUT//四次进与出
+    Cesium.EasingFunction.QUARTIC_OUT //四次出
+    Cesium.EasingFunction.QUINTIC_IN//五次进
+    Cesium.EasingFunction.QUINTIC_IN_OUT//五次进与出
+    Cesium.EasingFunction.QUINTIC_OUT//五次出
+    Cesium.EasingFunction.SINUSOIDAL_IN//正弦曲线的进
+    Cesium.EasingFunction.SINUSOIDAL_IN_OUT//正弦曲线进与出
+    Cesium.EasingFunction.SINUSOIDAL_OUT//正弦曲线出
+    */
+   
+
+  </script>
+</body>
+
+</html>

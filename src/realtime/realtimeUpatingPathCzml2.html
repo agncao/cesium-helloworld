@@ -9,9 +9,9 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
     <title>实时更新数据实现实体运功，按照新规划的路径行动</title>
-    <script src="../libs/Cesium/Cesium.js"></script>
+    <script src="../../libs/Cesium/Cesium.js"></script>
     <style>
-        @import url(../libs/Cesium/Widgets/widgets.css);
+        @import url(../../libs/Cesium/Widgets/widgets.css);
 
         html,
         body,
@@ -81,8 +81,8 @@
                 shouldAnimate: true
             });
 
-            let czmlPromise = Cesium.CzmlDataSource.load(czml);
-            viewer.dataSources.add(czmlPromise);
+            let czmlDatasource = new Cesium.CzmlDataSource();
+            viewer.dataSources.add(czmlDatasource.load(czml));
 
             // 记录线的坐标，PolyLinePrimitive实体类监听的坐标
             var positions = [];
@@ -148,16 +148,15 @@
             let lat = 3.956799;
             let lng = 2.87826541800007;
             let timeInterval = 20;
-            let ratationArr = [2.87826541800007, 3.956799];
+            let rotationArr = [2.87826541800007, 3.956799];
 
             setInterval(() => {
                 lat = lat + 10.001 * Math.random();
                 lng = lng + 10.001 * Math.random();
                 timeInterval += 10;
                 czml[1].position.cartographicDegrees = [lng, lat, 0];
-                ratationArr.push = [lng, lat];
+                rotationArr.push(lng, lat);
 
-                rotationArr.push(b, i);
                 if (rotationArr.length > 4) {
                     rotationArr.splice(0, 2);
                 }
@@ -165,7 +164,7 @@
                     var ag = getAngel(MyLatLng(rotationArr[0], rotationArr[1]), MyLatLng(rotationArr[2], rotationArr[3]));
                     czml[1].billboard.rotation = -ag * Math.PI / 180;
                 }
-                c2.process(czml2);
+                czmlDatasource.process(czml);
             }, 1000);
 
         }

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8" />
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <title>Hello World!</title>
+  <script src="../../libs/Cesium/Cesium.js"></script>
+  <style>
+    @import url(../../libs/Cesium/Widgets/widgets.css);
+
+    html,
+    body,
+    #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+    window.startup = async function (Cesium) {
+      const viewer = new Cesium.Viewer("cesiumContainer", {
+        shadows: true,
+      });
+
+      viewer.scene.globe.depthTestAgainstTerrain = true;
+      let tileset = await Cesium.Cesium3DTileset.fromUrl("../../apps/samples/Cesium3DTiles/Tilesets/Tileset/tileset.json");
+      viewer.scene.primitives.add(tileset);
+      //Cesium.HeadingPitchRange 是 CesiumJS 库中的一个类，用于定义一个视角，包括朝向（heading）、俯仰角（pitch）和距离（range）。这个类通常用于在3D场景中定位相机，以便从特定的角度和距离观察一个对象。
+      //朝向（Heading）：是一个角度值，表示观察方向沿着地面平面的旋转角度，通常以弧度为单位。朝向为0时，表示朝向正北方向，正值表示顺时针旋转，负值表示逆时针旋转。
+      // 俯仰角（Pitch）：也是一个角度值，表示观察方向相对于地面的倾斜角度，以弧度为单位。俯仰角为0时，视线平行于地面；正值表示向上倾斜，负值表示向下倾斜。
+      // 距离（Range）：表示观察点到目标点的直线距离，通常以米为单位。
+      //在Cesium中使用tileset.boundingSphere.radius的一个常见场景是在初始化视图或调整相机位置时，根据瓦片集的大小自动调整相机的位置和缩放级别，以确保整个瓦片集或其重要部分能够被用户清晰地看到。
+      //例如，通过设置相机距离为tileset.boundingSphere.radius的某个倍数，可以根据瓦片集的实际大小动态调整视图，使得瓦片集完整地出现在用户视野中。
+      viewer.zoomTo(tileset, new Cesium.HeadingPitchRange(0.0, -0.5, tileset.boundingSphere.radius * 2.0));
+
+      let nameOverlay = document.createElement("div");
+      viewer.container.appendChild(nameOverlay);
+      nameOverlay.className = "backdrop";
+      nameOverlay.style.display = "none";
+      nameOverlay.style.position = "absolute";
+      nameOverlay.style.bottom = "0";
+      nameOverlay.style.left = "0";
+      nameOverlay.style["pointer-events"] = "none";
+      nameOverlay.style.padding = "4px";
+      nameOverlay.style.backgroundColor = "black";
+      nameOverlay.style.color = "white";
+
+      let handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+      let lastSelected = { feature: undefined, originalColor: new window.Cesium.Color() };
+      handler.setInputAction(function (mov) {
+        let pickedFeature = viewer.scene.pick(mov.endPosition);
+        if (!Cesium.defined(pickedFeature)) {
+          nameOverlay.style.display = "none";
+          return;
+        }
+
+        nameOverlay.style.display = "block";
+        nameOverlay.style.bottom = viewer.canvas.clientHeight - mov.endPosition.y + "px";
+        nameOverlay.style.left = mov.endPosition.x + "px";
+        nameOverlay.textContent = "(" + pickedFeature.getProperty("longitude") + "," + pickedFeature.getProperty("latitude") + "," + pickedFeature.getProperty("height") + ")";
+
+        if (pickedFeature instanceof Cesium.Cesium3DTileFeature) {
+          var propertyNames = pickedFeature.getPropertyIds();
+          var length = propertyNames.length;
+          for (var i = 0; i < length; ++i) {
+            var propertyName = propertyNames[i];
+            console.log(propertyName + ': ' + pickedFeature.getProperty(propertyName));
+          }
+        }
+
+        if (Cesium.defined(lastSelected.feature) && lastSelected.feature !== pickedFeature) {
+          console.log("select a new feature, we must recovery the color of last feature: ", lastSelected.feature, lastSelected.originalColor);
+          lastSelected.feature.color = lastSelected.originalColor;
+          console.log("after recoveried: ", lastSelected.feature, lastSelected.originalColor);
+        }
+        if (lastSelected.feature !== pickedFeature) {
+          lastSelected.feature = pickedFeature;
+          Cesium.Color.clone(pickedFeature.color, lastSelected.originalColor);
+          console.log("original selected feature: ", lastSelected.feature, lastSelected.originalColor);
+          pickedFeature.color = Cesium.Color.YELLOW;
+          console.log("picked: ", pickedFeature, pickedFeature.color);
+        }
+      }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+    };
+
+    if (typeof Cesium !== 'undefined') {
+      window.startup(Cesium).catch((error) => {
+        console.error(error);
+      });
+    }
+
+  </script>
+</body>
+
+</html>

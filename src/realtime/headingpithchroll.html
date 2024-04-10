@@ -10,9 +10,9 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
     <title>Hello World!</title>
-    <script src="../libs/Cesium/Cesium.js"></script>
+    <script src="../../libs/Cesium/Cesium.js"></script>
     <style>
-        @import url(../libs/Cesium/Widgets/widgets.css);
+        @import url(../../libs/Cesium/Widgets/widgets.css);
 
         html,
         body,
@@ -70,7 +70,6 @@
         </table>
     </div>
     <script>
-
         Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
         window.startup = async function (Cesium) {
             let viewer = new Cesium.Viewer("cesiumContainer", {
@@ -106,7 +105,7 @@
 
             //modelMatrix 是一个在 3D 图形和游戏开发中常用的术语，它是一个变换矩阵，用于定义一个物体在 3D 空间中的位置、旋转和缩放。
             let planePrimitive = await Cesium.Model.fromGltfAsync({
-                url: "../apps/samples/models/CesiumAir/Cesium_Air.glb",
+                url: "../../apps/samples/models/CesiumAir/Cesium_Air.glb",
                 modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame( //这个函数创建一个表示地理位置的 Cartesian3 对象
                     position,
                     hpRoll,  //这是一个表示方向的对象

@@ -10,9 +10,9 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
     <title>Hello World!</title>
-    <script src="../libs/Cesium/Cesium.js"></script>
+    <script src="../../libs/Cesium/Cesium.js"></script>
     <style>
-        @import url(../libs/Cesium/Widgets/widgets.css);
+        @import url(../../libs/Cesium/Widgets/widgets.css);
 
         html,
         body,
@@ -37,7 +37,7 @@
             let entity = viewer.entities.add({
                 position: Cesium.Cartesian3.fromDegrees(-75.59777, 40.03883),
                 billboard: {
-                    image: "../images/position_marker.png",
+                    image: "../../images/position_marker.png",
                     show: true,
                     pixelOffset: new Cesium.Cartesian2(0, 0), // 相对模型的原始位置的偏移量: x轴偏移量（像素单位）,y轴偏移量(像素单位)
                     eyeOffset: new Cesium.Cartesian3(0.0, 0.0, 0.0),//相对于相机的偏移量，当多个billboard重叠时，可决定billboard放在最前面或最后面，最右边或者最左边等相对位置
