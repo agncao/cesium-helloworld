@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+    <title>实时更新数据实现实体运功，并绘制行走过的轨迹</title>
+    <script src="../../../libs/Cesium/Cesium.js"></script>
+    <script src="./flightRoute.js"></script>
+    <style>
+        @import url(../../../libs/Cesium/Widgets/widgets.css);
+
+        html,
+        body,
+        #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cesiumContainer"></div>
+    <script type="text/javascript">
+        Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzMjBhODJlNi0xMjQ1LTQ2ZmMtYThmNC1mMmFkODRkYzkxMGQiLCJpZCI6MTkwNTIyLCJpYXQiOjE3MDU1NzE2NDJ9.4LVhOUEXaMwUiOhL7qm9H-8pz-Lk278YJnHVd3CKh44";
+        window.startup = async function (Cesium) {
+            let viewer = new Cesium.Viewer("cesiumContainer", {
+                terrain: Cesium.Terrain.fromWorldTerrain(),
+            });
+
+            let shoots = [{
+                "shootId": 1, // 拍摄点ID
+                "aircraftAltitude": 294.4321622812281, // 无人机高度
+                "aircraftLatitude": 29.332291372123606, // 无人机纬度
+                "aircraftLongitude": 106.3275423851136, // 无人机经度
+                "gimbalPitchValue": -34.86589098646805, // 无人机云台俯仰角
+                "gimbalYawValue": -141.52559172027878, // 无人机云台偏航角
+                "isShoot": false // 是否为拍摄点
+            },
+            {
+                "shootId": 2,
+                "aircraftAltitude": 296.4321622812281,
+                "aircraftLatitude": 29.33218636728018,
+                "aircraftLongitude": 106.3274449132526,
+                "gimbalPitchValue": -29.77056379217234,
+                "gimbalYawValue": -141.52559171972544,
+                "isShoot": true
+            },
+            {
+                "shootId": 3,
+                "aircraftAltitude": 296.4321622812281,
+                "aircraftLatitude": 29.332086291515342,
+                "aircraftLongitude": 106.32743456106668,
+                "gimbalPitchValue": -49.79999923706055,
+                "gimbalYawValue": -143.6999969482422,
+                "isShoot": true
+            },
+            {
+                "shootId": 4,
+                "aircraftAltitude": 273.1146622812281,
+                "aircraftLatitude": 29.3320829466482,
+                "aircraftLongitude": 106.32743569795478,
+                "gimbalPitchValue": 0,
+                "gimbalYawValue": -96.52559172238325,
+                "isShoot": true
+            },
+
+            ];
+
+            let flightRoute = new FlightRoute(viewer, {
+                shoots: shoots,
+                pauseTime: 3,
+                speed: 3,
+                modelUri: './air.glb'
+            });
+
+            flightRoute.startFlight();
+        }
+
+        if (typeof Cesium !== 'undefined') {
+            window.startup(Cesium);
+        }
+    </script>
+</body>
+
+</html>
