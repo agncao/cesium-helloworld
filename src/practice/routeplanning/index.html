@@ -35,7 +35,7 @@
                 terrain: Cesium.Terrain.fromWorldTerrain(),
             });
 
-            let shoots = [{
+            let takenLocations = [{
                 "shootId": 1, // 拍摄点ID
                 "aircraftAltitude": 294.4321622812281, // 无人机高度
                 "aircraftLatitude": 29.332291372123606, // 无人机纬度
@@ -75,13 +75,16 @@
             ];
 
             let flightRoute = new FlightRoute(viewer, {
-                shoots: shoots,
-                pauseTime: 3,
+                takenLocations: takenLocations,
+                pauseTime: 1,
                 speed: 3,
                 modelUri: './air.glb'
             });
-
-            flightRoute.startFlight();
+            setTimeout(() => {
+                flightRoute.startFlight();
+                //始终跟随着模型
+                viewer.trackedEntity = flightRoute._model;
+            }, 5000);
         }
 
         if (typeof Cesium !== 'undefined') {
